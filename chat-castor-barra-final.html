@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Castor - Barra de Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: #1e1e1e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .castor-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .castor-logo h1 {
+            color: #e53e3e;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            letter-spacing: 2px;
+        }
+
+        .castor-logo p {
+            color: #cccccc;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            background: #2a2a2a;
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-input-container:hover {
+            border-color: #e53e3e;
+            box-shadow: 0 0 20px rgba(229, 62, 62, 0.2);
+        }
+
+        .chat-input-container:focus-within {
+            border-color: #e53e3e;
+            box-shadow: 0 0 25px rgba(229, 62, 62, 0.3);
+        }
+
+        .microphone-btn {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .microphone-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
+        .microphone-btn:active {
+            transform: scale(0.95);
+        }
+
+        .microphone-btn.recording {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(229, 62, 62, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+            }
+        }
+
+        .microphone-icon {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            padding: 10px 0;
+        }
+
+        .chat-input::placeholder {
+            color: #888;
+            font-style: italic;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .send-icon {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            margin-left: 2px;
+        }
+
+        .status-indicator {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            min-height: 20px;
+        }
+
+        .status-indicator.recording {
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .status-indicator.ready {
+            color: #48bb78;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                padding: 20px;
+            }
+            
+            .castor-logo h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-input-container {
+                padding: 10px 15px;
+            }
+            
+            .microphone-btn,
+            .send-btn {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .microphone-icon,
+            .send-icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="castor-logo">
+            <h1>CASTOR</h1>
+            <p>Assistente de Voz Inteligente</p>
+        </div>
+        
+        <div class="chat-input-container">
+            <button class="microphone-btn" id="micBtn" title="Clique para gravar áudio">
+                <svg class="microphone-icon" viewBox="0 0 24 24">
+                    <path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H6c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+            </button>
+            
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="chatInput" 
+                placeholder="Digite sua mensagem ou use o microfone..."
+                autocomplete="off"
+            >
+            
+            <button class="send-btn" id="sendBtn" title="Enviar mensagem" disabled>
+                <svg class="send-icon" viewBox="0 0 24 24">
+                    <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="status-indicator" id="statusIndicator">
+            Pronto para conversar
+        </div>
+    </div>
+
+    <script>
+        const micBtn = document.getElementById('micBtn');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        
+        let isRecording = false;
+        let recognition = null;
+
+        // Inicializar reconhecimento de voz se disponível
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'pt-BR';
+
+            recognition.onstart = function() {
+                isRecording = true;
+                micBtn.classList.add('recording');
+                statusIndicator.textContent = 'Gravando... Fale agora';
+                statusIndicator.classList.add('recording');
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+                updateSendButton();
+                statusIndicator.textContent = 'Texto capturado com sucesso';
+                statusIndicator.classList.remove('recording');
+                statusIndicator.classList.add('ready');
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Erro no reconhecimento de voz:', event.error);
+                statusIndicator.textContent = 'Erro ao capturar áudio. Tente novamente.';
+                statusIndicator.classList.remove('recording');
+            };
+
+            recognition.onend = function() {
+                isRecording = false;
+                micBtn.classList.remove('recording');
+                if (!statusIndicator.classList.contains('ready')) {
+                    statusIndicator.textContent = 'Pronto para conversar';
+                    statusIndicator.classList.remove('recording');
+                }
+            };
+        } else {
+            // Se não houver suporte ao reconhecimento de voz
+            statusIndicator.textContent = 'Reconhecimento de voz não disponível neste navegador';
+        }
+
+        // Event listeners
+        micBtn.addEventListener('click', function() {
+            if (!recognition) {
+                alert('Reconhecimento de voz não está disponível neste navegador.');
+                return;
+            }
+
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                chatInput.value = '';
+                updateSendButton();
+                statusIndicator.classList.remove('ready');
+                recognition.start();
+            }
+        });
+
+        chatInput.addEventListener('input', function() {
+            updateSendButton();
+            if (this.value.trim() && !statusIndicator.classList.contains('recording')) {
+                statusIndicator.textContent = 'Pressione Enter ou clique em Enviar';
+                statusIndicator.classList.add('ready');
+            } else if (!this.value.trim() && !statusIndicator.classList.contains('recording')) {
+                statusIndicator.textContent = 'Pronto para conversar';
+                statusIndicator.classList.remove('ready');
+            }
+        });
+
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', function() {
+            if (chatInput.value.trim()) {
+                sendMessage();
+            }
+        });
+
+        function updateSendButton() {
+            sendBtn.disabled = !chatInput.value.trim();
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                // Aqui você pode implementar a lógica de envio da mensagem
+                console.log('Mensagem enviada:', message);
+                
+                // Simular envio bem-sucedido
+                statusIndicator.textContent = 'Mensagem enviada com sucesso!';
+                statusIndicator.classList.remove('recording');
+                statusIndicator.classList.add('ready');
+                
+                // Limpar campo de input
+                chatInput.value = '';
+                updateSendButton();
+                
+                // Resetar status após 2 segundos
+                setTimeout(function() {
+                    statusIndicator.textContent = 'Pronto para conversar';
+                    statusIndicator.classList.remove('ready');
+                }, 2000);
+            }
+        }
+
+        // Inicializar estado do botão de envio
+        updateSendButton();
+    </script>
+</body>
+</html>
